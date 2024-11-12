@@ -21,46 +21,69 @@ class DatabaseService {
 
   Future<Database> getDatabase() async {
     final databaseDirPath = await getDatabasesPath();
-    final databasePath = join(databaseDirPath, "shop_db3.db");
+    final databasePath = join(databaseDirPath, "shop_db5.db");
     final database = await openDatabase(
       databasePath,
-      version: 5,
-      onCreate: (db, version) {
-        //Users
-        db.execute('''
-      CREATE TABLE Users (
-        id INTEGER PRIMARY KEY,
-        name TEXT NOT NULL
-      )
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute('''
+        CREATE TABLE Users (
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL
+        )
       ''');
 
-        //Products
-        db.execute('''
-      CREATE TABLE Products(
-        id INTEGER PRIMARY KEY,
-        name TEXT NOT NULL, 
-        price REAL NOT NULL,
-        image TEXT NOT NULL)
+        await db.execute('''
+        CREATE TABLE Products(
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL, 
+          price REAL NOT NULL,
+          image TEXT NOT NULL)
       ''');
 
-        db.execute('''
-          CREATE TABLE Cart(
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            price REAL NOT NULL,
-            image TEXT NOT NULL)
-          ''');
-      },
-      onUpgrade: (db, oldVersion, newVersion) {
-        if (oldVersion == 3) {
-          // db.execute('''
-          // CREATE TABLE History(
-          //   id INTEGER PRIMARY KEY,
-          //   name TEXT NOT NULL,
-          //   price REAL NOT NULL,
-          //   image TEXT NOT NULL)
-          // ''');
-        }
+        await db.execute('''
+        CREATE TABLE Cart(
+          id INTEGER PRIMARY KEY,
+          name TEXT NOT NULL,
+          price REAL NOT NULL,
+          image TEXT NOT NULL)
+      ''');
+
+        await db.execute('''
+        CREATE TABLE History (
+          id INTEGER PRIMARY KEY,
+          checkoutId TEXT NOT NULL,
+          name TEXT NOT NULL,
+          price REAL NOT NULL,
+          image TEXT NOT NULL
+        )
+      ''');
+
+        // Добавление начальных данных в таблицу Products
+        // await db.insert('Products', {
+        //   "name": "Парацетамол",
+        //   "price": 45.50,
+        //   "image":
+        //       "https://root.tblcdn.com/img/goods/af45c99d-56c8-41d0-a9de-165885bad426/1/img_0.jpg?v=AAAAAAnhZ4I",
+        // });
+        // await db.insert('Products', {
+        //   "name": "Нурофен",
+        //   "price": 98.30,
+        //   "image":
+        //       "https://root.tblcdn.com/img/goods/42132f85-e8cb-4c49-b9b3-275cbc7770b0/1/img_0.jpg?v=AAAAAAl986U",
+        // });
+        // await db.insert('Products', {
+        //   "name": "Парацетамол",
+        //   "price": 50,
+        //   "image":
+        //       "https://root.tblcdn.com/img/goods/af45c99d-56c8-41d0-a9de-165885bad426/1/img_0.jpg?v=AAAAAAnhZ4I",
+        // });
+        // await db.insert('Products', {
+        //   "name": "Нурофен",
+        //   "price": 30,
+        //   "image":
+        //       "https://root.tblcdn.com/img/goods/42132f85-e8cb-4c49-b9b3-275cbc7770b0/1/img_0.jpg?v=AAAAAAl986U",
+        // });
       },
     );
     return database;
@@ -116,6 +139,19 @@ class DatabaseService {
     return products;
   }
 
+  Future<List<Product>> getHistory() async {
+    final db = await database;
+    final data = await db.query('History');
+    List<Product> products = data
+        .map((e) => Product(
+            id: e['id'] as int,
+            name: e['name'] as String,
+            price: e['price'] as double,
+            image: e['image'] as String))
+        .toList();
+    return products;
+  }
+
   Future<void> deleteProduct(int id) async {
     final db = await database;
     await db.delete(
@@ -128,5 +164,16 @@ class DatabaseService {
   Future<void> checkOut() async {
     final db = await database;
     await db.delete('Cart');
+  }
+
+  Future<void> addToHistory(Product product, String checkOutId) async {
+    final db = await database;
+    final data = await db.query('History');
+    await db.insert('History', {
+      'checkoutId': checkOutId,
+      'name': product.name,
+      'price': product.price,
+      'image': product.image
+    });
   }
 }
