@@ -59,7 +59,6 @@ class DatabaseService {
         )
       ''');
 
-        // Добавление начальных данных в таблицу Products
         // await db.insert('Products', {
         //   "name": "Парацетамол",
         //   "price": 45.50,

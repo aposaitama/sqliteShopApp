@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/pages/home_page.dart';
+import 'package:shop/pages/login_page.dart';
+import 'package:shop/pages/register_page.dart';
 import 'package:shop/provider/product_provider.dart';
 
 void main() {
@@ -21,7 +23,11 @@ class MyApp extends StatelessWidget {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             useMaterial3: true,
           ),
-          home: const HomePage(),
+          routes: {
+            '/login_page': (context) => const LoginPage(),
+            '/register_page': (context) => const RegisterPage()
+          },
+          home: const LoginPage(),
         ));
   }
 }
