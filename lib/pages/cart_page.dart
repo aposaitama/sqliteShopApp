@@ -15,6 +15,7 @@ class _CartPageState extends State<CartPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Cart',
           style: TextStyle(fontWeight: FontWeight.bold),

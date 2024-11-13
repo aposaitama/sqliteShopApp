@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/provider/product_provider.dart';
 import 'package:shop/tile/cart_tile.dart';
+import 'package:shop/tile/history_tile.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -15,23 +16,50 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'History',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Consumer<ProductProvider>(builder: (context, history, child) {
-        final historyItems = history.productsHistory;
-        if (historyItems.isNotEmpty) {
+        final groupedHistory = history.groupedHistory;
+        if (groupedHistory.isNotEmpty) {
           return ListView.builder(
-            itemCount: historyItems.length,
+            itemCount: groupedHistory.length,
             itemBuilder: (context, index) {
-              final product = historyItems[index];
-              return CartItemTile(product: product);
+              final checkoutId = groupedHistory.keys.elementAt(index);
+              final products = groupedHistory[checkoutId]!;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Checkout ID: $checkoutId',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: products.length,
+                    itemBuilder: (context, productIndex) {
+                      final product = products[productIndex];
+                      return HistoryItemTile(product: product);
+                    },
+                  ),
+                ],
+              );
             },
           );
         } else {
-          return const Center(child: Text('Cart is empty'));
+          return const Center(child: Text('No purchase history available'));
         }
       }),
     );

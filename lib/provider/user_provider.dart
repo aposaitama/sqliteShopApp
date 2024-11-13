@@ -19,7 +19,7 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> logOut(User user) async {
+  Future<void> logOut() async {
     _currentUser = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('userID');
@@ -33,12 +33,11 @@ class UserProvider extends ChangeNotifier {
       newUser.id = userId;
       await setUser(newUser);
     } catch (e) {
-      // Если ошибка связана с уникальностью логина
       if (e is DatabaseException &&
           e.toString().contains("UNIQUE constraint failed")) {
         throw 'Login is already existed';
       } else {
-        throw 'Registration erorr, try later';
+        throw e;
       }
     }
   }

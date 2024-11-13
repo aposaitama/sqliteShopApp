@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
     const ProductsPage(),
     const CartPage(),
     const HistoryPage(),
-    // const UserProfilePage(),
+    const UserProfilePage(),
   ];
 
   @override
@@ -48,28 +48,28 @@ class _HomePageState extends State<HomePage> {
               shadowElevation: 5,
               textOverflow: TextOverflow.visible,
               notchBottomBarController: _controller,
-              bottomBarHeight: 40,
+              bottomBarHeight: 30,
               bottomBarItems: const [
                 BottomBarItem(
                     inActiveItem: Icon(Icons.search),
                     activeItem: Icon(Icons.search,
                         color: Color.fromRGBO(67, 176, 42, 1)),
-                    itemLabel: 'Каталог'),
+                    itemLabel: 'Catalog'),
                 BottomBarItem(
                     inActiveItem: Icon(Icons.shopping_basket),
                     activeItem: Icon(Icons.shopping_basket,
                         color: Color.fromRGBO(67, 176, 42, 1)),
-                    itemLabel: 'Кошик'),
+                    itemLabel: 'Cart'),
                 BottomBarItem(
                     inActiveItem: Icon(Icons.history),
                     activeItem: Icon(Icons.history,
                         color: Color.fromRGBO(67, 176, 42, 1)),
-                    itemLabel: 'Історія'),
+                    itemLabel: 'History'),
                 BottomBarItem(
                     inActiveItem: Icon(Icons.person),
                     activeItem: Icon(Icons.person,
                         color: Color.fromRGBO(67, 176, 42, 1)),
-                    itemLabel: 'Профіль'),
+                    itemLabel: 'Profile'),
               ],
               onTap: (index) {
                 _pageController.jumpToPage(index);

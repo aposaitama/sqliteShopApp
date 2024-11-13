@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/provider/product_provider.dart';
 import 'package:shop/provider/user_provider.dart';
 import 'package:shop/widgets/gesture_detector.dart';
 import 'package:shop/widgets/text_field.dart';
@@ -18,6 +19,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -55,6 +59,9 @@ class _LoginPageState extends State<LoginPage> {
                               await userProvider.login(email, password);
 
                           if (isLoginCorrect == true) {
+                            await Provider.of<ProductProvider>(context,
+                                    listen: false)
+                                .loadUserId();
                             Navigator.pushNamed(context, '/home_page');
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(

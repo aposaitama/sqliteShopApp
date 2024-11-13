@@ -15,7 +15,7 @@ class _HistoryItemTileState extends State<HistoryItemTile> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 150,
+      height: 100,
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(8)),
       margin: const EdgeInsets.only(bottom: 10),
@@ -31,15 +31,6 @@ class _HistoryItemTileState extends State<HistoryItemTile> {
               )),
           title: Text(widget.product.name),
           subtitle: Text(widget.product.price.toString()),
-          trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                if (widget.product.id != null) {
-                  Provider.of<ProductProvider>(context, listen: false)
-                      .removeProduct(widget.product
-                          .id!); // Use the ! to assert the id is non-null
-                }
-              }),
         ),
       ),
     );

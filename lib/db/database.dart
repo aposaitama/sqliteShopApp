@@ -43,12 +43,17 @@ class DatabaseService {
       ''');
 
         await db.execute('''
-        CREATE TABLE Cart(
-          id INTEGER PRIMARY KEY,
-          name TEXT NOT NULL,
-          price REAL NOT NULL,
-          image TEXT NOT NULL)
-      ''');
+CREATE TABLE Cart(
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  price REAL NOT NULL,
+  image TEXT NOT NULL,
+  userId INTEGER,
+  productId INTEGER,
+  FOREIGN KEY (userId) REFERENCES Users(id),
+  FOREIGN KEY (productId) REFERENCES Products(id)
+)
+''');
 
         await db.execute('''
         CREATE TABLE History (
@@ -56,7 +61,9 @@ class DatabaseService {
           checkoutId TEXT NOT NULL,
           name TEXT NOT NULL,
           price REAL NOT NULL,
-          image TEXT NOT NULL
+          image TEXT NOT NULL,
+          userId INTEGER,
+          FOREIGN KEY (userId) REFERENCES Users(id)
         )
       ''');
 
@@ -91,9 +98,17 @@ class DatabaseService {
 
   //db methods for products
 
-  Future<void> addProduct(Product product) async {
+  Future<void> addProduct(Product product, int userId) async {
     final db = await database;
-    await db.insert('Cart', product.toMap());
+    await db.insert('Cart', {
+      'id': product.id,
+      'name': product.name,
+      'price': product.price,
+      'image': product.image,
+      'userId': userId,
+      'productId': product.id,
+    });
+    // product.toMap());
   }
 
   Future<List<Product>> getProducts() async {
@@ -129,9 +144,10 @@ class DatabaseService {
   }
 
   //db methods for cart
-  Future<List<Product>> getProductsFromCart() async {
+  Future<List<Product>> getProductsFromCart(int userId) async {
     final db = await database;
-    final data = await db.query('Cart');
+    final data =
+        await db.query('Cart', where: 'userId = ?', whereArgs: [userId]);
     List<Product> products = data
         .map((e) => Product(
             id: e['id'] as int,
@@ -142,36 +158,40 @@ class DatabaseService {
     return products;
   }
 
-  Future<List<Product>> getHistory() async {
+  Future<List<Product>> getHistory(int userId) async {
     final db = await database;
-    final data = await db.query('History');
+    final data =
+        await db.query('History', where: 'userId = ?', whereArgs: [userId]);
     List<Product> products = data
         .map((e) => Product(
             id: e['id'] as int,
             name: e['name'] as String,
             price: e['price'] as double,
-            image: e['image'] as String))
+            image: e['image'] as String,
+            checkoutId: e['checkoutId'] as String))
         .toList();
     return products;
   }
 
-  Future<void> deleteProduct(int id) async {
+  Future<void> deleteProduct(int id, int userId) async {
     final db = await database;
     await db.delete(
       'Cart',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'id = ? AND userId = ?',
+      whereArgs: [id, userId],
     );
   }
 
-  Future<void> checkOut() async {
+  Future<void> checkOut(int userId) async {
     final db = await database;
-    await db.delete('Cart');
+    await db.delete('Cart', where: 'userId = ?', whereArgs: [userId]);
   }
 
-  Future<void> addToHistory(Product product, String checkOutId) async {
+  Future<void> addToHistory(
+      Product product, String checkOutId, int userId) async {
     final db = await database;
     await db.insert('History', {
+      'userId': userId,
       'checkoutId': checkOutId,
       'name': product.name,
       'price': product.price,

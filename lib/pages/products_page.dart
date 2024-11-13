@@ -15,6 +15,7 @@ class _ProductsPageState extends State<ProductsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Products',
           style: TextStyle(fontWeight: FontWeight.bold),
