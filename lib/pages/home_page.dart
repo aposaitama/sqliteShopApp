@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
     const ProductsPage(),
     const CartPage(),
     const HistoryPage(),
-    const UserProfilePage(),
+    // const UserProfilePage(),
   ];
 
   @override

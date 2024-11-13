@@ -29,7 +29,8 @@ class DatabaseService {
         await db.execute('''
         CREATE TABLE Users (
           id INTEGER PRIMARY KEY,
-          name TEXT NOT NULL
+          login TEXT NOT NULL UNIQUE,
+          password TEXT NOT NULL
         )
       ''');
 
@@ -59,30 +60,30 @@ class DatabaseService {
         )
       ''');
 
-        // await db.insert('Products', {
-        //   "name": "Парацетамол",
-        //   "price": 45.50,
-        //   "image":
-        //       "https://root.tblcdn.com/img/goods/af45c99d-56c8-41d0-a9de-165885bad426/1/img_0.jpg?v=AAAAAAnhZ4I",
-        // });
-        // await db.insert('Products', {
-        //   "name": "Нурофен",
-        //   "price": 98.30,
-        //   "image":
-        //       "https://root.tblcdn.com/img/goods/42132f85-e8cb-4c49-b9b3-275cbc7770b0/1/img_0.jpg?v=AAAAAAl986U",
-        // });
-        // await db.insert('Products', {
-        //   "name": "Парацетамол",
-        //   "price": 50,
-        //   "image":
-        //       "https://root.tblcdn.com/img/goods/af45c99d-56c8-41d0-a9de-165885bad426/1/img_0.jpg?v=AAAAAAnhZ4I",
-        // });
-        // await db.insert('Products', {
-        //   "name": "Нурофен",
-        //   "price": 30,
-        //   "image":
-        //       "https://root.tblcdn.com/img/goods/42132f85-e8cb-4c49-b9b3-275cbc7770b0/1/img_0.jpg?v=AAAAAAl986U",
-        // });
+        await db.insert('Products', {
+          "name": "Парацетамол",
+          "price": 45.50,
+          "image":
+              "https://root.tblcdn.com/img/goods/af45c99d-56c8-41d0-a9de-165885bad426/1/img_0.jpg?v=AAAAAAnhZ4I",
+        });
+        await db.insert('Products', {
+          "name": "Нурофен",
+          "price": 98.30,
+          "image":
+              "https://root.tblcdn.com/img/goods/42132f85-e8cb-4c49-b9b3-275cbc7770b0/1/img_0.jpg?v=AAAAAAl986U",
+        });
+        await db.insert('Products', {
+          "name": "Парацетамол",
+          "price": 50,
+          "image":
+              "https://root.tblcdn.com/img/goods/af45c99d-56c8-41d0-a9de-165885bad426/1/img_0.jpg?v=AAAAAAnhZ4I",
+        });
+        await db.insert('Products', {
+          "name": "Нурофен",
+          "price": 30,
+          "image":
+              "https://root.tblcdn.com/img/goods/42132f85-e8cb-4c49-b9b3-275cbc7770b0/1/img_0.jpg?v=AAAAAAl986U",
+        });
       },
     );
     return database;
@@ -110,18 +111,21 @@ class DatabaseService {
 
   //db methods for users
 
-  Future<void> addUser(String name) async {
+  Future<int> addUser(String login, String password) async {
     final db = await database;
-    await db.insert('Users', {'name': name});
+    final userId =
+        await db.insert('Users', {'login': login, 'password': password});
+    return userId;
   }
 
-  Future<List<User>> getUsers() async {
+  Future<int?> loginUser(String login, String password) async {
     final db = await database;
-    final data = await db.query('Users');
-    List<User> users = data
-        .map((e) => User(id: e['id'] as int, name: e['name'] as String))
-        .toList();
-    return users;
+    final userId = await db.query('Users',
+        where: 'login = ? AND password = ?', whereArgs: [login, password]);
+    if (userId.isNotEmpty) {
+      return userId.first['id'] as int;
+    }
+    return null;
   }
 
   //db methods for cart
@@ -167,7 +171,6 @@ class DatabaseService {
 
   Future<void> addToHistory(Product product, String checkOutId) async {
     final db = await database;
-    final data = await db.query('History');
     await db.insert('History', {
       'checkoutId': checkOutId,
       'name': product.name,

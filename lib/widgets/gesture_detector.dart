@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class MyGestureDetector extends StatelessWidget {
-  Function()? onTap;
-  String text;
-  MyGestureDetector({super.key, required this.onTap, required this.text});
+  final Function()? onTap;
+  final String text;
+  const MyGestureDetector({super.key, required this.onTap, required this.text});
   static const introColor = Color.fromRGBO(89, 177, 137, 1);
   @override
   Widget build(BuildContext context) {

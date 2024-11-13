@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shop/provider/user_provider.dart';
 import 'package:shop/widgets/gesture_detector.dart';
 import 'package:shop/widgets/text_field.dart';
 
@@ -41,7 +43,42 @@ class _LoginPageState extends State<LoginPage> {
                 height: 15,
               ),
               //login button
-              MyGestureDetector(onTap: () {}, text: 'Login'),
+              Consumer<UserProvider>(builder: (context, userProvider, child) {
+                return MyGestureDetector(
+                    onTap: () async {
+                      final email = emailController.text.trim();
+                      final password = passwordController.text.trim();
+
+                      if (email.isNotEmpty && password.isNotEmpty) {
+                        try {
+                          final isLoginCorrect =
+                              await userProvider.login(email, password);
+
+                          if (isLoginCorrect == true) {
+                            Navigator.pushNamed(context, '/home_page');
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Enter correct login and password')),
+                            );
+                          }
+                        } catch (e) {
+                          // Обработка ошибки регистрации
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(e.toString())),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Enter login and password')),
+                        );
+                      }
+                    },
+                    text: 'Login');
+              }),
+
               GestureDetector(
                 onTap: () {
                   Navigator.pushNamed(context, '/register_page');
